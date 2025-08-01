@@ -1,17 +1,14 @@
 import * as S from './styles'
 
-import { Produto } from '../../App'
-
 import cesta from '../../assets/cesta.png'
 import { paraReal } from '../Produto'
+import { useAppSelector } from '../../store/reducers/hooks'
 
-type Props = {
-  itensNoCarrinho: Produto[]
-  favoritos: Produto[]
-}
+const Header = () => {
+  const { cartProducts } = useAppSelector((state) => state.cart)
+  const { favItens } = useAppSelector((state) => state.fav)
 
-const Header = ({ itensNoCarrinho, favoritos }: Props) => {
-  const valorTotal = itensNoCarrinho.reduce((acc, item) => {
+  const valorTotal = cartProducts.reduce((acc, item) => {
     acc += item.preco
     return acc
   }, 0)
@@ -20,10 +17,10 @@ const Header = ({ itensNoCarrinho, favoritos }: Props) => {
     <S.Header>
       <h1>EBAC Sports</h1>
       <div>
-        <span>{favoritos.length} favoritos</span>
+        <span>{favItens.length} favoritos</span>
         <img src={cesta} />
         <span>
-          {itensNoCarrinho.length} itens, valor total: {paraReal(valorTotal)}
+          {cartProducts.length} itens, valor total: {paraReal(valorTotal)}
         </span>
       </div>
     </S.Header>

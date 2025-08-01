@@ -1,10 +1,10 @@
-import { Produto as ProdutoType } from '../../App'
+import { setProductsCart, typeProduct } from '../../store/reducers/cart'
 import * as S from './styles'
+import { setFavoriteItens } from '../../store/reducers/fav'
+import { useAppDispatch, useAppSelector } from '../../store/reducers/hooks'
 
 type Props = {
-  produto: ProdutoType
-  aoComprar: (produto: ProdutoType) => void
-  favoritar: (produto: ProdutoType) => void
+  produto: typeProduct
   estaNosFavoritos: boolean
 }
 
@@ -13,12 +13,30 @@ export const paraReal = (valor: number) =>
     valor
   )
 
-const ProdutoComponent = ({
-  produto,
-  aoComprar,
-  favoritar,
-  estaNosFavoritos
-}: Props) => {
+const ProdutoComponent = ({ produto, estaNosFavoritos }: Props) => {
+  const dispatch = useAppDispatch()
+  const { favItens } = useAppSelector((state) => state.fav)
+  const { cartProducts } = useAppSelector((state) => state.cart)
+
+  const handleFavoriteClick = () => {
+    if (favItens.find((p) => p.id === produto.id)) {
+      const favItensSemProduto: typeProduct[] = favItens.filter(
+        (p) => p.id !== produto.id
+      )
+      dispatch(setFavoriteItens(favItensSemProduto))
+    } else {
+      dispatch(setFavoriteItens([...favItens, produto]))
+    }
+  }
+
+  const handleAddCartButton = () => {
+    if (cartProducts.find((p) => p.id === produto.id)) {
+      alert('Item já adicionado')
+    } else {
+      dispatch(setProductsCart([...cartProducts, produto]))
+    }
+  }
+
   return (
     <S.Produto>
       <S.Capa>
@@ -28,12 +46,12 @@ const ProdutoComponent = ({
       <S.Prices>
         <strong>{paraReal(produto.preco)}</strong>
       </S.Prices>
-      <S.BtnComprar onClick={() => favoritar(produto)} type="button">
+      <S.BtnComprar onClick={handleFavoriteClick} type="button">
         {estaNosFavoritos
           ? '- Remover dos favoritos'
           : '+ Adicionar aos favoritos'}
       </S.BtnComprar>
-      <S.BtnComprar onClick={() => aoComprar(produto)} type="button">
+      <S.BtnComprar onClick={handleAddCartButton} type="button">
         Adicionar ao carrinho
       </S.BtnComprar>
     </S.Produto>
